@@ -74,35 +74,45 @@ class _MovieExplorerHomePageState extends State<MovieExplorerHomePage> {
   }
 
   Future<void> _searchMovies(String query) async {
-    print(query);
-    query.toString();
+    if (query == null || query == "" || query.isEmpty || query == " ") {
+      // No realizar búsqueda si la consulta es nula o vacía
+      return;
+    }
+
     try {
-      final response = await http.get(
-        Uri.parse(
-          '${ApiConfig.baseUrl}/search/movie?api_key=${ApiConfig.apiKey}&query=$query',
-        ),
-      );
+      final url = Uri.https('api.themoviedb.org', '/3/search/movie', {
+        'api_key': ApiConfig.apiKey,
+        'language': 'es-ES', // Puedes ajustar el idioma según tus necesidades
+        'page': '1',
+        'query': query,
+      });
+
+      final response = await http.get(url);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        final List<dynamic> results = data['results'];
-        final List<Movie> searchedMovies =
-            results.map((json) => Movie.fromJson(json)).toList();
+        if (data.containsKey('results') && data['results'] is List) {
+          final List<dynamic> results = data['results'];
+          final List<Movie> searchedMovies =
+              results.map((json) => Movie.fromJson(json)).toList();
 
-        setState(() {
-          movies.clear(); // Limpiar la lista actual de películas
-          movies.addAll(searchedMovies); // Agregar las películas de la búsqueda
-        });
+          setState(() {
+            movies.clear(); // Limpiar la lista actual de películas
+            movies
+                .addAll(searchedMovies); // Agregar las películas de la búsqueda
+          });
+        } else {
+          // El formato de respuesta no es el esperado
+          print('Error: Formato de respuesta inesperado');
+        }
       } else {
-        throw Exception('Failed to search movies');
+        // La solicitud no fue exitosa
+        print('Error: ${response.statusCode}, ${response.reasonPhrase}');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Búsqueda no disponible'),
-          duration: Duration(seconds: 2),
-        ),
-      );
+      // Error general durante la búsqueda
+      print('Error searching movies: $e');
+      // También puedes mostrar un mensaje al usuario si lo deseas.
     }
   }
 
@@ -137,23 +147,19 @@ class _MovieExplorerHomePageState extends State<MovieExplorerHomePage> {
             ],
           ),
           Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Buscar películas',
-                hintStyle: TextStyle(color: Colors.white54),
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    _searchMovies(_searchController.text);
-                  },
-                  icon: Icon(Icons.search),
-                ),
-              ),
-              style: TextStyle(color: Colors.white),
-              cursorColor: Colors.white,
-            ),
-          ),
+              padding: const EdgeInsets.all(10.0),
+              child: SearchBar(
+                controller: _searchController,
+                padding: const MaterialStatePropertyAll<EdgeInsets>(
+                    EdgeInsets.symmetric(horizontal: 16.0)),
+                onTap: () {
+                  _searchMovies(_searchController.text);
+                },
+                onChanged: (_) {
+                  _searchMovies(_searchController.text);
+                },
+                leading: const Icon(Icons.search),
+              )),
           Expanded(
             child: movies.isEmpty
                 ? const Center(

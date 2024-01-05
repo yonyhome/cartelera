@@ -1,4 +1,4 @@
-// ignore_for_file: use_key_in_widget_constructors, use_build_context_synchronously, depend_on_referenced_packages
+// ignore_for_file: use_key_in_widget_constructors, use_build_context_synchronously
 
 import 'package:cartelera/database/database_helper.dart';
 import 'package:cartelera/services/api_config.dart';
@@ -60,10 +60,10 @@ class MovieDetailsWidget extends StatelessWidget {
                       await _saveMovieLocally(context, movie);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor:
+                      primary:
                           Colors.black, // Cambiar el color de fondo a negro
                     ),
-                    child: const Text('Guardar Película'),
+                    child: Text('Guardar Película'),
                   ),
                 ],
               ),
@@ -101,11 +101,10 @@ class MovieDetailsWidget extends StatelessWidget {
         'imageUrl': movie.posterPath,
         'genres': movie.genres.map((genre) => genre.name).join(', '),
         'overview': movie.overview,
-        'vote': movie.voteAverage,
       };
 
       final id = await dbHelper.insert(movieData);
-      if (id.isEven) {
+      if (id != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Película guardada localmente'),

@@ -2,6 +2,8 @@
 
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:cartelera/models/movie.dart'; // Asegúrate de importar tu modelo Movie y Genre
+
 class DatabaseHelper {
   static const _databaseName = 'movies_database.db';
   static const _databaseVersion = 1;
@@ -13,7 +15,6 @@ class DatabaseHelper {
   static const columnImageUrl = 'imageUrl';
   static const columnGenres = 'genres';
   static const columnOverview = 'overview';
-  static const columnVoteAverage = 'voteAverage';
 
   DatabaseHelper._privateConstructor();
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
@@ -42,8 +43,7 @@ class DatabaseHelper {
       $columnReleaseDate text not null,
       $columnImageUrl text not null,
       $columnGenres text not null,
-      $columnOverview text not null,
-      $columnVoteAverage real not null
+      $columnOverview text not null
     )
   ''');
   }
@@ -81,12 +81,28 @@ class DatabaseHelper {
     );
 
     if (result.isNotEmpty) {
-     
+      Map<String, dynamic> movieData = result.first;
       return true;
     } else {
       return false;
     }
   }
 
+  Movie _createMovieInstanceFromDatabaseData(Map<String, dynamic> data) {
+    return Movie(
+      id: data[columnId],
+      title: data[columnTitle],
+      releaseDate: data[columnReleaseDate],
+      posterPath: data[columnImageUrl],
+      overview: data[columnOverview],
+      genres: _convertGenresStringToList(data[columnGenres]),
+    );
+  }
 
+  List<Genre> _convertGenresStringToList(String genresString) {
+    return genresString
+        .split(',')
+        .map((genreName) => Genre(id: 0, name: genreName.trim()))
+        .toList();
+  }
 }

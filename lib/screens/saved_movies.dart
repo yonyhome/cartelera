@@ -1,5 +1,3 @@
-// ignore_for_file: use_key_in_widget_constructors, depend_on_referenced_packages, library_private_types_in_public_api
-
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cartelera/services/api_config.dart';
@@ -67,12 +65,11 @@ class _SavedMoviesViewState extends State<SavedMoviesView> {
                     _confirmDeleteAllMovies(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        Colors.white, // Cambiar el color de fondo a negro
+                    primary: Colors.black, // Cambiar el color de fondo a negro
                   ),
                   child: const Text(
                     'Borrar Todas',
-                    style: TextStyle(color: Colors.black),
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ],
@@ -226,7 +223,7 @@ class SavedMovieWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Mostrar la imagen del póster
-                SizedBox(
+                Container(
                   width: double.infinity,
                   height: 200,
                   child: CachedNetworkImage(

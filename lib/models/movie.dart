@@ -3,7 +3,6 @@ class Movie {
   final String title;
   final String overview;
   final String posterPath;
-  final double voteAverage;
   final String releaseDate; // Corregido: Cambiado de relaseDate a releaseDate
   final List<Genre> genres;
 
@@ -12,7 +11,6 @@ class Movie {
     required this.title,
     required this.overview,
     required this.posterPath,
-    required this.voteAverage,
     required this.releaseDate,
     required this.genres,
   });
@@ -55,7 +53,6 @@ class Movie {
       title: json["title"],
       overview: json["overview"],
       posterPath: json["poster_path"],
-      voteAverage: json["vote_average"].toDouble(),
       releaseDate: json["release_date"],
       genres: genreList,
     );
